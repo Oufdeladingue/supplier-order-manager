@@ -1,0 +1,222 @@
+================================================================================
+   GESTIONNAIRE DE COMMANDES FOURNISSEURS - APERÇU DES FICHIERS
+================================================================================
+
+📁 STRUCTURE COMPLÈTE DU PROJET
+================================================================================
+
+supplier-order-manager/
+│
+├── 📄 FICHIERS DE LANCEMENT
+│   ├── start_app.bat                  → Double-clic pour lancer l'app
+│   └── .env (à créer)                 → Configuration (copier .env.example)
+│
+├── 📚 DOCUMENTATION (À LIRE EN PREMIER)
+│   ├── QUICK_START.md                 → ⚡ Démarrage rapide (15 min)
+│   ├── README.md                      → 📖 Documentation principale
+│   ├── INSTALLATION.md                → 🔧 Installation détaillée
+│   ├── USAGE.md                       → 🎮 Guide d'utilisation quotidien
+│   ├── TRANSFORMATIONS_GUIDE.md       → 🔄 Config des transformations
+│   └── PROJECT_SUMMARY.md             → 📋 Vue d'ensemble complète
+│
+├── ⚙️ CONFIGURATION
+│   ├── .env.example                   → Template de configuration
+│   ├── requirements.txt               → Dépendances Python
+│   └── config/
+│       ├── supabase_schema.sql        → Schéma base de données
+│       ├── suppliers.json             → Config des 15 fournisseurs
+│       └── transformations.json       → Règles de transformation
+│
+├── 💻 APPLICATION DESKTOP
+│   └── app/
+│       ├── main.py                    → 🚀 Point d'entrée
+│       ├── ui/
+│       │   ├── main_window.py         → Interface principale
+│       │   └── login_dialog.py        → Écran de connexion
+│       ├── services/
+│       │   ├── supabase_client.py     → Client API Supabase
+│       │   └── file_processor.py      → Moteur de transformation
+│       └── models/
+│           └── file_record.py         → Modèles de données
+│
+├── 🤖 WORKER DE COLLECTE
+│   └── worker/
+│       ├── collector.py               → Orchestrateur principal
+│       ├── email_fetcher.py           → Collecte emails (IMAP/Exchange)
+│       ├── ftp_fetcher.py             → Collecte FTP/SFTP
+│       └── setup_scheduler.bat        → Config tâche planifiée Windows
+│
+└── 📊 DOSSIERS GÉNÉRÉS (créés automatiquement)
+    ├── logs/                          → Logs de l'application et worker
+    ├── temp/                          → Fichiers temporaires
+    └── venv/                          → Environnement virtuel Python
+
+================================================================================
+📊 STATISTIQUES DU PROJET
+================================================================================
+
+✅ Fichiers Python :          13 fichiers
+✅ Fichiers Configuration :    5 fichiers (SQL, JSON, ENV)
+✅ Documentation :             6 guides complets
+✅ Scripts utilitaires :       2 fichiers BAT
+✅ Lignes de code :           ~3500 lignes
+✅ Technologies :              8 technologies majeures
+
+================================================================================
+🎯 ORDRE DE LECTURE RECOMMANDÉ
+================================================================================
+
+Pour démarrer :
+  1. QUICK_START.md         → Démarrage rapide
+  2. INSTALLATION.md        → Installation pas à pas
+  3. README.md              → Documentation complète
+
+Pour utiliser :
+  4. USAGE.md               → Guide d'utilisation quotidien
+  5. TRANSFORMATIONS_GUIDE  → Configuration des transformations
+
+Pour comprendre :
+  6. PROJECT_SUMMARY.md     → Vue d'ensemble technique
+
+================================================================================
+🚀 COMMANDES RAPIDES
+================================================================================
+
+Première installation :
+  1. python -m venv venv
+  2. .\venv\Scripts\activate
+  3. pip install -r requirements.txt
+  4. Créer .env depuis .env.example
+  5. Configurer Supabase (voir INSTALLATION.md)
+
+Lancer l'application :
+  • Double-clic sur start_app.bat
+  OU
+  • .\venv\Scripts\activate
+  • python app\main.py
+
+Tester la collecte :
+  • python worker\collector.py
+
+Configurer la tâche planifiée :
+  • cd worker
+  • .\setup_scheduler.bat (en admin)
+
+Voir les logs :
+  • type logs\app_*.log | more
+  • type logs\collector_*.log | more
+
+================================================================================
+⚙️ FICHIERS À CONFIGURER (obligatoire)
+================================================================================
+
+1. .env                           → Créer depuis .env.example
+   - Clés Supabase
+   - Identifiants email
+   - Identifiants FTP
+
+2. config/suppliers.json          → Ajouter vos 15 fournisseurs
+   - ID unique par fournisseur
+   - Email ou FTP
+   - Patterns de fichiers
+
+3. config/transformations.json    → Règles de transformation
+   - Une règle par fournisseur
+   - Mapping des colonnes
+   - Formatage
+
+================================================================================
+🔐 FICHIERS SENSIBLES (ne jamais partager)
+================================================================================
+
+⚠️  .env                          → Contient mots de passe et clés API
+⚠️  logs/                         → Peut contenir données sensibles
+⚠️  temp/                         → Fichiers temporaires
+
+Ces fichiers sont dans .gitignore et ne seront jamais versionnés.
+
+================================================================================
+📈 CAPACITÉS DU SYSTÈME
+================================================================================
+
+Actuellement supporté :
+  • 2 postes utilisateurs simultanés
+  • 15 fournisseurs configurables
+  • ~15 fichiers par jour (1 par fournisseur)
+  • Collecte automatique quotidienne
+  • Transformation automatique
+  • Historique complet
+  • Collaboration en temps réel
+
+Peut évoluer vers :
+  • Plus d'utilisateurs (illimité avec Supabase)
+  • Plus de fournisseurs (configuration JSON)
+  • Plus de volume (Supabase Pro scalable)
+  • Multi-sites (cloud Supabase)
+
+================================================================================
+🛠️ TECHNOLOGIES UTILISÉES
+================================================================================
+
+Frontend :              PySide6 (Qt for Python)
+Backend :               Supabase (PostgreSQL + Storage + Auth)
+Traitement données :    Pandas
+Collecte email :        imaplib / exchangelib
+Collecte FTP :          Paramiko (SFTP)
+Logs :                  Loguru
+Planification :         Windows Task Scheduler
+Langage :               Python 3.9+
+
+================================================================================
+✅ CHECKLIST DÉPLOIEMENT
+================================================================================
+
+Installation :
+  [  ] Python installé
+  [  ] Environnement virtuel créé
+  [  ] Dépendances installées
+  [  ] Supabase configuré (DB + Storage + Auth)
+  [  ] Fichier .env créé et rempli
+
+Configuration :
+  [  ] 15 fournisseurs dans suppliers.json
+  [  ] 15 transformations dans transformations.json
+  [  ] Tâche planifiée configurée (1 poste uniquement)
+
+Tests :
+  [  ] Application se lance
+  [  ] Connexion Supabase OK
+  [  ] Collecte manuelle testée
+  [  ] Transformation testée
+  [  ] Collaboration testée (2 postes)
+
+Production :
+  [  ] Formation utilisateurs
+  [  ] Documentation distribuée
+  [  ] Support défini
+  [  ] Backup Supabase configuré
+
+================================================================================
+📞 SUPPORT ET AIDE
+================================================================================
+
+En cas de problème :
+  1. Consultez la documentation pertinente
+  2. Vérifiez les logs dans logs/
+  3. Testez les connexions (Supabase, Email, FTP)
+  4. Consultez INSTALLATION.md section "Dépannage"
+
+Ressources :
+  • Documentation complète dans les fichiers .md
+  • Logs détaillés dans logs/
+  • Exemples de config dans config/
+
+================================================================================
+🎉 PRÊT À DÉMARRER !
+================================================================================
+
+Vous avez maintenant une application complète et professionnelle.
+
+Prochaine étape : Ouvrez QUICK_START.md pour commencer !
+
+================================================================================

@@ -1,0 +1,40 @@
+# Interface utilisateur
+PySide6==6.8.1
+PySide6-Addons==6.8.1
+PySide6-Essentials==6.8.1
+
+# Base de données et backend
+supabase==2.11.0
+python-dotenv==1.0.1
+
+# Traitement des données
+pandas==2.2.0
+openpyxl==3.1.2
+xlrd==2.0.1
+
+# Emails
+exchangelib==5.4.3
+imaplib2==3.6
+
+# FTP/SFTP
+paramiko==3.4.0
+
+# Utilitaires
+python-dateutil==2.8.2
+pytz==2024.1
+requests==2.32.3
+
+# Logging
+loguru==0.7.2
+
+# Validation
+pydantic==2.10.5
+packaging==24.2
+
+# Automatisation Web
+selenium==4.27.1
+webdriver-manager==4.0.2
+undetected-chromedriver==3.5.5
+
+# Build
+pyinstaller==6.11.1

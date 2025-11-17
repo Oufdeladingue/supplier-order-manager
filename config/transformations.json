@@ -1,0 +1,31 @@
+{
+  "transformations": {
+    "transform_supplier_001": {
+      "description": "Transformation pour Fournisseur 1",
+      "column_mapping": {
+        "reference": "product_ref",
+        "quantite": "quantity",
+        "prix": "unit_price"
+      },
+      "columns_to_add": {
+        "date_commande": "today"
+      },
+      "columns_to_remove": ["colonne_inutile"],
+      "format_rules": {
+        "product_ref": "uppercase",
+        "quantity": "integer"
+      }
+    },
+    "transform_supplier_002": {
+      "description": "Transformation pour Fournisseur 2",
+      "column_mapping": {
+        "SKU": "product_ref",
+        "Qty": "quantity"
+      },
+      "columns_to_add": {},
+      "columns_to_remove": [],
+      "format_rules": {}
+    }
+  },
+  "note": "Vous pourrez configurer les règles de transformation pour chaque fournisseur"
+}

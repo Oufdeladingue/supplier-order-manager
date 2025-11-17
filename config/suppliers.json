@@ -1,0 +1,168 @@
+{
+  "suppliers": [
+    {
+      "id": "honda",
+      "name": "Honda",
+      "file_patterns": ["Honda-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_honda",
+      "min_order": 500
+    },
+    {
+      "id": "stihl",
+      "name": "Stihl",
+      "file_patterns": ["Stihl-*.csv", "Matériel Stihl-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_stihl"
+    },
+    {
+      "id": "husqvarna",
+      "name": "Husqvarna",
+      "file_patterns": ["Husqvarna-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_husqvarna"
+    },
+    {
+      "id": "iseki_france",
+      "name": "Iseki France",
+      "file_patterns": ["Iseki France-*.csv", "Iseki France (accessoires)-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_iseki_france"
+    },
+    {
+      "id": "etesia_wolf",
+      "name": "Etesia-Wolf",
+      "file_patterns": ["Etesia-Wolf-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_etesia_wolf"
+    },
+    {
+      "id": "grillo",
+      "name": "Grillo",
+      "file_patterns": ["Grillo-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_grillo"
+    },
+    {
+      "id": "kiva",
+      "name": "Kiva",
+      "file_patterns": ["Kiva-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_kiva"
+    },
+    {
+      "id": "ppk",
+      "name": "PPK",
+      "file_patterns": ["PPK-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_ppk"
+    },
+    {
+      "id": "m_jardin",
+      "name": "M-Jardin",
+      "file_patterns": ["M-Jardin-*.csv", "M-Jardin Bleu-*.csv", "M Jardin-*.csv", "M Jardin Bleu-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_m_jardin"
+    },
+    {
+      "id": "sabre_france",
+      "name": "Sabre France",
+      "file_patterns": ["Sabre France-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_sabre_france"
+    },
+    {
+      "id": "solvert",
+      "name": "Solvert",
+      "file_patterns": ["Solvert-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_solvert"
+    },
+    {
+      "id": "emak",
+      "name": "Emak",
+      "file_patterns": ["Emak-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_emak"
+    },
+    {
+      "id": "as_motor",
+      "name": "AS Motor",
+      "file_patterns": ["AS Motor-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_as_motor"
+    },
+    {
+      "id": "dpm_70",
+      "name": "DPM 70",
+      "file_patterns": ["DPM 70-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_dpm_70"
+    },
+    {
+      "id": "pellenc",
+      "name": "Pellenc",
+      "file_patterns": ["Pellenc-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_pellenc"
+    },
+    {
+      "id": "dolmar_makita",
+      "name": "Dolmar-Makita",
+      "file_patterns": ["Dolmar-Makita-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_dolmar_makita"
+    },
+    {
+      "id": "kramp",
+      "name": "Kramp",
+      "file_patterns": ["Kramp-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_kramp"
+    },
+    {
+      "id": "rel_jardin",
+      "name": "Rel Jardin",
+      "file_patterns": ["Rel Jardin-*.csv"],
+      "active": true,
+      "source": "ftp",
+      "ftp_path": "/home/mjard_ep43/export-cdes-fournisseurs",
+      "transformation_id": "transform_rel_jardin"
+    }
+  ],
+  "note": "Configuration des 18 fournisseurs identifiés sur le serveur SFTP. Les fichiers XX-PERIME-XX sont exclus automatiquement."
+}
