@@ -12,9 +12,6 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 
-# Version de l'application
-__version__ = "1.0.2"
-
 # Charger les variables d'environnement
 load_dotenv()
 
@@ -23,6 +20,7 @@ sys.path.append(str(Path(__file__).parent.parent))
 
 from app.ui.main_window import MainWindow
 from app.utils import get_resource_path
+from app.version import __version__, APP_NAME
 
 # Configuration du logger
 log_folder = Path("logs")
@@ -38,7 +36,7 @@ def main():
 
     # Créer l'application Qt
     app = QApplication(sys.argv)
-    app.setApplicationName(os.getenv("APP_NAME", "Gestionnaire Commandes Fournisseurs"))
+    app.setApplicationName(APP_NAME)
     app.setApplicationVersion(__version__)
 
     # Définir l'icône de l'application

@@ -417,7 +417,8 @@ class SettingsDialog(QDialog):
         info_layout.addWidget(app_name)
 
         # Version
-        version = QLabel(f"Version {os.getenv('APP_VERSION', '1.0.0')}")
+        from app.version import __version__
+        version = QLabel(f"Version {__version__}")
         version.setStyleSheet("font-size: 11pt; color: #666;")
         version.setAlignment(Qt.AlignCenter)
         info_layout.addWidget(version)
@@ -647,41 +648,28 @@ class SettingsDialog(QDialog):
             )
 
     def check_for_updates(self):
-        """Vérifie les mises à jour disponibles sur GitHub"""
+        """Vérifie les mises à jour disponibles et lance le téléchargement automatique"""
         try:
-            import requests
-            from packaging import version
+            from app.utils import auto_updater
+            from app.version import __version__
 
-            # Récupérer la version actuelle
-            import app.main as main_module
-            current_version = main_module.__version__
+            # Vérifier les mises à jour
+            update_info = auto_updater.check_and_prompt_update(self)
 
-            logger.info(f"Vérification des mises à jour... Version actuelle: {current_version}")
-
-            # Interroger l'API GitHub pour la dernière release
-            github_repo = "Oufdeladingue/supplier-order-manager"
-            api_url = f"https://api.github.com/repos/{github_repo}/releases/latest"
-
-            response = requests.get(api_url, timeout=10)
-            response.raise_for_status()
-
-            release_data = response.json()
-            latest_version = release_data['tag_name'].lstrip('v')  # Enlever le 'v' de 'v1.0.0'
-            release_url = release_data['html_url']
-            release_notes = release_data['body']
-
-            logger.info(f"Dernière version disponible: {latest_version}")
-
-            # Comparer les versions
-            if version.parse(latest_version) > version.parse(current_version):
+            if update_info:
                 # Une mise à jour est disponible
+                current_version = __version__
+                latest_version = update_info['version']
+                release_notes = update_info.get('release_notes', '')
+
                 message = (
                     f"🎉 Une nouvelle version est disponible !\n\n"
                     f"Version actuelle: v{current_version}\n"
                     f"Nouvelle version: v{latest_version}\n\n"
                     f"Notes de version:\n{release_notes[:300]}"
                     f"{'...' if len(release_notes) > 300 else ''}\n\n"
-                    f"Voulez-vous télécharger la mise à jour ?"
+                    f"La mise à jour sera téléchargée et installée automatiquement.\n"
+                    f"Voulez-vous continuer ?"
                 )
 
                 reply = QMessageBox.question(
@@ -693,16 +681,14 @@ class SettingsDialog(QDialog):
                 )
 
                 if reply == QMessageBox.Yes:
-                    # Ouvrir la page de release dans le navigateur
-                    import webbrowser
-                    webbrowser.open(release_url)
-                    logger.info(f"Ouverture de la page de release: {release_url}")
+                    # Télécharger et installer la mise à jour
+                    self.download_and_install_update(update_info)
             else:
                 # Déjà à jour
                 QMessageBox.information(
                     self,
                     "Aucune mise à jour",
-                    f"Version actuelle: v{current_version}\n\n"
+                    f"Version actuelle: v{__version__}\n\n"
                     "✅ Vous utilisez déjà la dernière version de l'application."
                 )
                 logger.info("Application déjà à jour")
@@ -723,3 +709,79 @@ class SettingsDialog(QDialog):
                 "Erreur",
                 f"Impossible de vérifier les mises à jour:\n{str(e)}"
             )
+
+    def download_and_install_update(self, update_info):
+        """
+        Télécharge et installe la mise à jour
+
+        Args:
+            update_info: Informations de la mise à jour (dict)
+        """
+        from PySide6.QtWidgets import QProgressDialog
+        from PySide6.QtCore import Qt
+        from app.utils import auto_updater
+
+        download_url = update_info.get('download_url')
+        if not download_url:
+            QMessageBox.warning(
+                self,
+                "Erreur",
+                "Impossible de trouver l'URL de téléchargement de la mise à jour."
+            )
+            return
+
+        # Créer une boîte de dialogue de progression
+        progress = QProgressDialog(
+            "Téléchargement de la mise à jour...",
+            "Annuler",
+            0, 100,
+            self
+        )
+        progress.setWindowTitle("Mise à jour")
+        progress.setWindowModality(Qt.WindowModal)
+        progress.setAutoClose(False)
+        progress.setAutoReset(False)
+
+        # Fonction callback pour la progression
+        def update_progress(percentage):
+            progress.setValue(percentage)
+            QApplication.processEvents()
+
+        # Télécharger la mise à jour
+        progress.show()
+        installer_path = auto_updater.download_update(download_url, update_progress)
+
+        if installer_path:
+            progress.setValue(100)
+            progress.setLabelText("Téléchargement terminé !")
+
+            # Demander confirmation pour installer
+            reply = QMessageBox.question(
+                self,
+                "Installer la mise à jour",
+                "La mise à jour a été téléchargée avec succès.\n\n"
+                "L'application va se fermer et l'installeur sera lancé.\n"
+                "Voulez-vous continuer ?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes
+            )
+
+            if reply == QMessageBox.Yes:
+                # Lancer l'installeur et quitter
+                if auto_updater.install_update(installer_path):
+                    # Quitter l'application
+                    QApplication.quit()
+                else:
+                    QMessageBox.warning(
+                        self,
+                        "Erreur",
+                        "Impossible de lancer l'installeur de mise à jour."
+                    )
+        else:
+            QMessageBox.warning(
+                self,
+                "Erreur",
+                "Le téléchargement de la mise à jour a échoué."
+            )
+
+        progress.close()
