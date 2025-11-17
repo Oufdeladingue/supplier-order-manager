@@ -22,10 +22,12 @@ from app.ui.main_window import MainWindow
 from app.utils import get_resource_path
 from app.version import __version__, APP_NAME
 
-# Configuration du logger
-log_folder = Path("logs")
-log_folder.mkdir(exist_ok=True)
-logger.add("logs/app_{time}.log", rotation="1 day", retention="30 days", level="DEBUG")
+# Configuration du logger dans le dossier utilisateur
+# Utiliser AppData/Local au lieu du dossier Program Files
+app_data_folder = Path.home() / "AppData" / "Local" / "SupplierOrderManager"
+log_folder = app_data_folder / "logs"
+log_folder.mkdir(parents=True, exist_ok=True)
+logger.add(log_folder / "app_{time}.log", rotation="1 day", retention="30 days", level="DEBUG")
 
 
 def main():
