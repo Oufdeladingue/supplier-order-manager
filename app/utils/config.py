@@ -1,10 +1,11 @@
 """
 Gestion centralisée de la configuration
 Fonctionne à la fois en mode développement (avec .env) et en mode production (exécutable)
+Mode production : récupère les identifiants FTP depuis Supabase
 """
 
 import os
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from loguru import logger
 
 
@@ -53,18 +54,63 @@ class Config:
         self.SUPABASE_URL = os.getenv("SUPABASE_URL", self.SUPABASE_URL)
         self.SUPABASE_KEY = os.getenv("SUPABASE_KEY", self.SUPABASE_KEY)
 
-        # FTP - OBLIGATOIRE depuis .env (pas de valeurs par défaut pour sécurité)
+        # FTP - Priorité 1: .env, Priorité 2: Supabase (chargé plus tard après connexion)
         self.FTP_HOST = os.getenv("FTP_HOST")
         self.FTP_PORT = int(os.getenv("FTP_PORT", 22))
         self.FTP_USERNAME = os.getenv("FTP_USERNAME")
         self.FTP_PASSWORD = os.getenv("FTP_PASSWORD")
         self.FTP_PATH = os.getenv("FTP_PATH")
 
-        # Avertir si les identifiants FTP ne sont pas configurés
-        if not all([self.FTP_HOST, self.FTP_USERNAME, self.FTP_PASSWORD]):
-            logger.warning("⚠️ Identifiants FTP manquants dans .env - Les fonctionnalités FTP seront désactivées")
+        # Note: Si les identifiants FTP ne sont pas dans .env, ils seront chargés depuis Supabase
+        # lors de l'appel à load_ftp_from_supabase() après la connexion utilisateur
 
         logger.info("Configuration chargée avec succès")
+
+    def load_ftp_from_supabase(self, supabase_client) -> bool:
+        """
+        Charge les identifiants FTP depuis Supabase si non présents dans .env
+
+        Args:
+            supabase_client: Instance du client Supabase authentifié
+
+        Returns:
+            bool: True si les identifiants ont été chargés, False sinon
+        """
+        # Si les identifiants FTP sont déjà présents (via .env), ne pas les remplacer
+        if all([self.FTP_HOST, self.FTP_USERNAME, self.FTP_PASSWORD]):
+            logger.info("Identifiants FTP déjà configurés via .env")
+            return True
+
+        try:
+            # Récupérer les paramètres de l'organisation depuis Supabase
+            response = supabase_client.client.table('organization_settings')\
+                .select('ftp_host, ftp_port, ftp_username, ftp_password, ftp_path')\
+                .eq('organization_name', 'default')\
+                .execute()
+
+            if response.data and len(response.data) > 0:
+                org_settings = response.data[0]
+
+                # Charger les identifiants FTP depuis Supabase
+                self.FTP_HOST = org_settings.get('ftp_host')
+                self.FTP_PORT = org_settings.get('ftp_port', 22)
+                self.FTP_USERNAME = org_settings.get('ftp_username')
+                self.FTP_PASSWORD = org_settings.get('ftp_password')
+                self.FTP_PATH = org_settings.get('ftp_path')
+
+                if all([self.FTP_HOST, self.FTP_USERNAME, self.FTP_PASSWORD]):
+                    logger.info("✅ Identifiants FTP chargés depuis Supabase")
+                    return True
+                else:
+                    logger.warning("⚠️ Identifiants FTP incomplets dans Supabase")
+                    return False
+            else:
+                logger.warning("⚠️ Aucun paramètre d'organisation trouvé dans Supabase")
+                return False
+
+        except Exception as e:
+            logger.error(f"Erreur lors du chargement des identifiants FTP depuis Supabase: {e}")
+            return False
 
     def get_supabase_config(self) -> Dict[str, str]:
         """Retourne la configuration Supabase"""

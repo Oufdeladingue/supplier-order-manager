@@ -111,6 +111,13 @@ class LoginDialog(QDialog):
             logger.info("Connexion réussie")
             # Sauvegarder le username pour la prochaine fois
             self.save_last_username(identifier)
+
+            # Charger les identifiants FTP depuis Supabase
+            from app.utils import config
+            ftp_loaded = config.load_ftp_from_supabase(supabase_client)
+            if not ftp_loaded:
+                logger.warning("Les identifiants FTP n'ont pas pu être chargés depuis Supabase")
+
             self.accept()
         else:
             error = result.get('error', 'Erreur inconnue')

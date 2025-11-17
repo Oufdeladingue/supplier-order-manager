@@ -671,15 +671,17 @@ class MainWindow(QMainWindow):
         QApplication.processEvents()
 
         try:
-            # Récupérer les paramètres FTP depuis .env
-            ftp_host = os.getenv("FTP_HOST")
-            ftp_port = int(os.getenv("FTP_PORT", 22))
-            ftp_user = os.getenv("FTP_USERNAME")
-            ftp_pass = os.getenv("FTP_PASSWORD")
-            ftp_path = os.getenv("FTP_REMOTE_PATH", "/home/mjard_ep43/export-cdes-fournisseurs")
+            # Récupérer les paramètres FTP depuis la configuration centralisée
+            from app.utils import config
+            ftp_config = config.get_ftp_config()
+            ftp_host = ftp_config.get("host")
+            ftp_port = ftp_config.get("port", 22)
+            ftp_user = ftp_config.get("username")
+            ftp_pass = ftp_config.get("password")
+            ftp_path = ftp_config.get("path", "/home/mjard_ep43/export-cdes-fournisseurs")
 
             if not all([ftp_host, ftp_user, ftp_pass]):
-                raise ValueError("Configuration FTP incomplète dans .env")
+                raise ValueError("Configuration FTP incomplète - Identifiants FTP manquants")
 
             self.statusBar.showMessage("🔄 Connexion au serveur FTP...")
             self.progress_bar.setValue(10)
