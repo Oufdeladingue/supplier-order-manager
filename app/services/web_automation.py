@@ -38,6 +38,28 @@ class WebAutomationService:
         self.driver: Optional[webdriver.Remote] = None
         self.wait_timeout = 10  # Secondes
 
+    @staticmethod
+    def _is_chrome_installed() -> bool:
+        """Vérifie si Chrome est installé"""
+        import platform
+        import subprocess
+
+        if platform.system() == 'Windows':
+            try:
+                # Vérifier si chrome.exe existe dans les emplacements standards
+                chrome_paths = [
+                    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+                    os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe")
+                ]
+                for path in chrome_paths:
+                    if os.path.exists(path):
+                        return True
+                return False
+            except:
+                return False
+        return True  # Sur Linux/Mac, on suppose que c'est géré par le système
+
     def _get_driver(self) -> webdriver.Remote:
         """
         Crée et configure le driver Selenium approprié avec options anti-détection
@@ -74,41 +96,30 @@ class WebAutomationService:
                 driver = webdriver.Edge(service=service, options=options)
 
             else:  # Chrome par défaut
-                # Créer un profil Chrome dédié à l'application
-                # Cela simule un utilisateur réel qui revient régulièrement
-                app_data_dir = Path.home() / '.supplier_order_manager' / 'chrome_profile'
-                app_data_dir.mkdir(parents=True, exist_ok=True)
+                # Vérifier si Chrome est installé, sinon utiliser Edge
+                chrome_installed = self._is_chrome_installed()
 
-                logger.info(f"Utilisation du profil Chrome dédié: {app_data_dir}")
+                if not chrome_installed:
+                    logger.warning("Chrome n'est pas installé, utilisation de Edge comme fallback")
+                    # Rediriger vers Edge
+                    service = EdgeService(EdgeChromiumDriverManager().install())
+                    options = webdriver.EdgeOptions()
 
-                # Détecter si on est dans un exécutable PyInstaller
-                import sys
-                is_frozen = getattr(sys, 'frozen', False)
-
-                if is_frozen:
-                    # Mode PyInstaller : utiliser webdriver standard pour éviter les subprocess
-                    logger.info("Mode PyInstaller détecté : utilisation de webdriver standard")
-                    from selenium.webdriver.chrome.service import Service as ChromeService
-                    from webdriver_manager.chrome import ChromeDriverManager
-
-                    options = webdriver.ChromeOptions()
-
-                    # Utiliser le profil dédié
+                    # Profil dédié pour Edge
+                    app_data_dir = Path.home() / '.supplier_order_manager' / 'edge_profile'
+                    app_data_dir.mkdir(parents=True, exist_ok=True)
                     options.add_argument(f'--user-data-dir={str(app_data_dir)}')
 
-                    # Anti-détection (maximum possible sans undetected-chromedriver)
+                    # Anti-détection pour Edge
                     options.add_argument('--disable-blink-features=AutomationControlled')
                     options.add_experimental_option("excludeSwitches", ["enable-automation"])
                     options.add_experimental_option('useAutomationExtension', False)
                     options.add_argument('--disable-dev-shm-usage')
                     options.add_argument('--no-sandbox')
                     options.add_argument('--disable-gpu')
-                    options.add_argument('--start-maximized')
+                    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0")
 
-                    # User agent réaliste
-                    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-
-                    # Préférences pour désactiver les popups
+                    # Préférences
                     prefs = {
                         "credentials_enable_service": False,
                         "profile.password_manager_enabled": False,
@@ -116,11 +127,57 @@ class WebAutomationService:
                     }
                     options.add_experimental_option("prefs", prefs)
 
-                    # Créer le service avec flags de détachement
-                    service = ChromeService(ChromeDriverManager().install())
+                    driver = webdriver.Edge(service=service, options=options)
+                    logger.info("Driver Edge initialisé avec succès (fallback - Chrome non installé)")
 
-                    # Créer le driver
-                    driver = webdriver.Chrome(service=service, options=options)
+                else:
+                    # Créer un profil Chrome dédié à l'application
+                    # Cela simule un utilisateur réel qui revient régulièrement
+                    app_data_dir = Path.home() / '.supplier_order_manager' / 'chrome_profile'
+                    app_data_dir.mkdir(parents=True, exist_ok=True)
+
+                    logger.info(f"Utilisation du profil Chrome dédié: {app_data_dir}")
+
+                    # Détecter si on est dans un exécutable PyInstaller
+                    import sys
+                    is_frozen = getattr(sys, 'frozen', False)
+
+                    if is_frozen:
+                        # Mode PyInstaller : utiliser webdriver standard pour éviter les subprocess
+                        logger.info("Mode PyInstaller détecté : utilisation de webdriver standard")
+                        from selenium.webdriver.chrome.service import Service as ChromeService
+                        from webdriver_manager.chrome import ChromeDriverManager
+
+                        options = webdriver.ChromeOptions()
+
+                        # Utiliser le profil dédié
+                        options.add_argument(f'--user-data-dir={str(app_data_dir)}')
+
+                        # Anti-détection (maximum possible sans undetected-chromedriver)
+                        options.add_argument('--disable-blink-features=AutomationControlled')
+                        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+                        options.add_experimental_option('useAutomationExtension', False)
+                        options.add_argument('--disable-dev-shm-usage')
+                        options.add_argument('--no-sandbox')
+                        options.add_argument('--disable-gpu')
+                        options.add_argument('--start-maximized')
+
+                        # User agent réaliste
+                        options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
+                        # Préférences pour désactiver les popups
+                        prefs = {
+                            "credentials_enable_service": False,
+                            "profile.password_manager_enabled": False,
+                            "profile.default_content_setting_values.notifications": 2
+                        }
+                        options.add_experimental_option("prefs", prefs)
+
+                        # Créer le service avec flags de détachement
+                        service = ChromeService(ChromeDriverManager().install())
+
+                        # Créer le driver
+                        driver = webdriver.Chrome(service=service, options=options)
 
                 else:
                     # Mode développement : utiliser undetected-chromedriver
