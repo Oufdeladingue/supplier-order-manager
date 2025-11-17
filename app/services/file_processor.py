@@ -15,8 +15,13 @@ from app.models.file_record import FileType
 class FileProcessor:
     """Classe pour traiter et transformer les fichiers fournisseurs"""
 
-    def __init__(self, temp_folder: str = "./temp"):
-        self.temp_folder = Path(temp_folder)
+    def __init__(self, temp_folder: Optional[str] = None):
+        # Utiliser AppData/Local pour éviter les problèmes de permissions
+        if temp_folder is None:
+            app_data = Path.home() / "AppData" / "Local" / "SupplierOrderManager"
+            self.temp_folder = app_data / "temp"
+        else:
+            self.temp_folder = Path(temp_folder)
         self.temp_folder.mkdir(parents=True, exist_ok=True)
 
     def read_file(self, file_path: str, file_type: FileType) -> Optional[pd.DataFrame]:
