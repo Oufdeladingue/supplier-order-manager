@@ -1146,10 +1146,12 @@ class MainWindow(QMainWindow):
 
         # Connexion FTP pour télécharger et analyser les fichiers
         try:
-            ftp_host = os.getenv("FTP_HOST")
-            ftp_port = int(os.getenv("FTP_PORT", 22))
-            ftp_user = os.getenv("FTP_USERNAME")
-            ftp_pass = os.getenv("FTP_PASSWORD")
+            from app.utils import config
+            ftp_config = config.get_ftp_config()
+            ftp_host = ftp_config.get("host")
+            ftp_port = ftp_config.get("port", 22)
+            ftp_user = ftp_config.get("username")
+            ftp_pass = ftp_config.get("password")
 
             fetcher = FTPFetcher(ftp_host, ftp_port, ftp_user, ftp_pass, use_sftp=True)
             if not fetcher.connect():
@@ -1302,10 +1304,12 @@ class MainWindow(QMainWindow):
             self.statusBar.showMessage("Téléchargement en cours...")
 
             # Connexion FTP
-            ftp_host = os.getenv("FTP_HOST")
-            ftp_port = int(os.getenv("FTP_PORT", 22))
-            ftp_user = os.getenv("FTP_USERNAME")
-            ftp_pass = os.getenv("FTP_PASSWORD")
+            from app.utils import config
+            ftp_config = config.get_ftp_config()
+            ftp_host = ftp_config.get("host")
+            ftp_port = ftp_config.get("port", 22)
+            ftp_user = ftp_config.get("username")
+            ftp_pass = ftp_config.get("password")
 
             fetcher = FTPFetcher(ftp_host, ftp_port, ftp_user, ftp_pass, use_sftp=True)
             fetcher.connect()
@@ -1482,11 +1486,13 @@ class MainWindow(QMainWindow):
         try:
             self.statusBar.showMessage(f"Archivage de {len(checked_files)} fichier(s) en cours...")
 
-            # Récupérer la config FTP depuis .env
-            host = os.getenv("FTP_HOST")
-            port = int(os.getenv("FTP_PORT", 22))
-            username = os.getenv("FTP_USERNAME")
-            password = os.getenv("FTP_PASSWORD")
+            # Récupérer la config FTP depuis Supabase
+            from app.utils import config
+            ftp_config = config.get_ftp_config()
+            host = ftp_config.get("host")
+            port = ftp_config.get("port", 22)
+            username = ftp_config.get("username")
+            password = ftp_config.get("password")
 
             # Se connecter au serveur FTP
             fetcher = FTPFetcher(host, port, username, password, use_sftp=True)
@@ -1604,10 +1610,12 @@ class MainWindow(QMainWindow):
             logger.info(f"Configuration d'impression: colonnes={columns_to_remove}, préfixes={prefixes_to_remove}, date={add_date}, split={split_files}, format={paper_format}")
 
             # Connexion FTP pour télécharger les fichiers
-            ftp_host = os.getenv("FTP_HOST")
-            ftp_port = int(os.getenv("FTP_PORT", 22))
-            ftp_user = os.getenv("FTP_USERNAME")
-            ftp_pass = os.getenv("FTP_PASSWORD")
+            from app.utils import config
+            ftp_config = config.get_ftp_config()
+            ftp_host = ftp_config.get("host")
+            ftp_port = ftp_config.get("port", 22)
+            ftp_user = ftp_config.get("username")
+            ftp_pass = ftp_config.get("password")
 
             fetcher = FTPFetcher(ftp_host, ftp_port, ftp_user, ftp_pass, use_sftp=True)
             fetcher.connect()
@@ -1900,10 +1908,12 @@ class MainWindow(QMainWindow):
             logger.info(f"En-tête: add_output_header={add_output_header}, header_type={header_type}, header_content='{header_content}'")
 
             # Connexion FTP pour télécharger les fichiers
-            ftp_host = os.getenv("FTP_HOST")
-            ftp_port = int(os.getenv("FTP_PORT", 22))
-            ftp_user = os.getenv("FTP_USERNAME")
-            ftp_pass = os.getenv("FTP_PASSWORD")
+            from app.utils import config
+            ftp_config = config.get_ftp_config()
+            ftp_host = ftp_config.get("host")
+            ftp_port = ftp_config.get("port", 22)
+            ftp_user = ftp_config.get("username")
+            ftp_pass = ftp_config.get("password")
 
             fetcher = FTPFetcher(ftp_host, ftp_port, ftp_user, ftp_pass, use_sftp=True)
             fetcher.connect()
@@ -2272,10 +2282,12 @@ class MainWindow(QMainWindow):
             logger.info(f"Configuration d'affichage: colonnes={columns_to_remove}, préfixes={prefixes_to_remove}, date={add_date}, split={split_files}")
 
             # Connexion FTP pour télécharger les fichiers
-            ftp_host = os.getenv("FTP_HOST")
-            ftp_port = int(os.getenv("FTP_PORT", 22))
-            ftp_user = os.getenv("FTP_USERNAME")
-            ftp_pass = os.getenv("FTP_PASSWORD")
+            from app.utils import config
+            ftp_config = config.get_ftp_config()
+            ftp_host = ftp_config.get("host")
+            ftp_port = ftp_config.get("port", 22)
+            ftp_user = ftp_config.get("username")
+            ftp_pass = ftp_config.get("password")
 
             fetcher = FTPFetcher(ftp_host, ftp_port, ftp_user, ftp_pass, use_sftp=True)
             fetcher.connect()

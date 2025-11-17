@@ -73,7 +73,7 @@ class WebAutomationService:
 
                 driver = webdriver.Edge(service=service, options=options)
 
-            else:  # Chrome par défaut avec undetected-chromedriver
+            else:  # Chrome par défaut
                 # Créer un profil Chrome dédié à l'application
                 # Cela simule un utilisateur réel qui revient régulièrement
                 app_data_dir = Path.home() / '.supplier_order_manager' / 'chrome_profile'
@@ -81,30 +81,73 @@ class WebAutomationService:
 
                 logger.info(f"Utilisation du profil Chrome dédié: {app_data_dir}")
 
-                # Utiliser undetected-chromedriver pour éviter la détection
-                options = uc.ChromeOptions()
+                # Détecter si on est dans un exécutable PyInstaller
+                import sys
+                is_frozen = getattr(sys, 'frozen', False)
 
-                # Utiliser le profil dédié (conserve cookies, historique, etc.)
-                options.add_argument(f'--user-data-dir={str(app_data_dir)}')
+                if is_frozen:
+                    # Mode PyInstaller : utiliser webdriver standard pour éviter les subprocess
+                    logger.info("Mode PyInstaller détecté : utilisation de webdriver standard")
+                    from selenium.webdriver.chrome.service import Service as ChromeService
+                    from webdriver_manager.chrome import ChromeDriverManager
 
-                # Options minimales (undetected-chromedriver gère déjà la plupart)
-                options.add_argument('--disable-dev-shm-usage')
-                options.add_argument('--no-sandbox')
+                    options = webdriver.ChromeOptions()
 
-                # Préférences pour désactiver les popups
-                prefs = {
-                    "credentials_enable_service": False,
-                    "profile.password_manager_enabled": False,
-                    "profile.default_content_setting_values.notifications": 2
-                }
-                options.add_experimental_option("prefs", prefs)
+                    # Utiliser le profil dédié
+                    options.add_argument(f'--user-data-dir={str(app_data_dir)}')
 
-                # Créer le driver avec undetected-chromedriver
-                driver = uc.Chrome(
-                    options=options,
-                    version_main=None,  # Auto-détecte la version de Chrome
-                    use_subprocess=False
-                )
+                    # Anti-détection (maximum possible sans undetected-chromedriver)
+                    options.add_argument('--disable-blink-features=AutomationControlled')
+                    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+                    options.add_experimental_option('useAutomationExtension', False)
+                    options.add_argument('--disable-dev-shm-usage')
+                    options.add_argument('--no-sandbox')
+                    options.add_argument('--disable-gpu')
+                    options.add_argument('--start-maximized')
+
+                    # User agent réaliste
+                    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
+                    # Préférences pour désactiver les popups
+                    prefs = {
+                        "credentials_enable_service": False,
+                        "profile.password_manager_enabled": False,
+                        "profile.default_content_setting_values.notifications": 2
+                    }
+                    options.add_experimental_option("prefs", prefs)
+
+                    # Créer le service avec flags de détachement
+                    service = ChromeService(ChromeDriverManager().install())
+
+                    # Créer le driver
+                    driver = webdriver.Chrome(service=service, options=options)
+
+                else:
+                    # Mode développement : utiliser undetected-chromedriver
+                    logger.info("Mode développement : utilisation de undetected-chromedriver")
+                    options = uc.ChromeOptions()
+
+                    # Utiliser le profil dédié
+                    options.add_argument(f'--user-data-dir={str(app_data_dir)}')
+
+                    # Options minimales (undetected-chromedriver gère déjà la plupart)
+                    options.add_argument('--disable-dev-shm-usage')
+                    options.add_argument('--no-sandbox')
+
+                    # Préférences pour désactiver les popups
+                    prefs = {
+                        "credentials_enable_service": False,
+                        "profile.password_manager_enabled": False,
+                        "profile.default_content_setting_values.notifications": 2
+                    }
+                    options.add_experimental_option("prefs", prefs)
+
+                    # Créer le driver avec undetected-chromedriver
+                    driver = uc.Chrome(
+                        options=options,
+                        version_main=None,
+                        use_subprocess=False
+                    )
 
             # Configuration commune
             driver.maximize_window()

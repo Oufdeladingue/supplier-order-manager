@@ -2,7 +2,7 @@
 ; Nécessite Inno Setup 6.x : https://jrsoftware.org/isinfo.php
 
 #define MyAppName "Gestionnaire Commandes Fournisseurs"
-#define MyAppVersion "1.0.3"
+#define MyAppVersion "1.0.5"
 #define MyAppPublisher "M-Jardin"
 #define MyAppExeName "SupplierOrderManager.exe"
 #define MyAppURL "https://github.com/Oufdeladingue/supplier-order-manager"

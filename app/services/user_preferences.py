@@ -3,6 +3,7 @@ Service pour gérer les préférences utilisateur locales (spécifiques au poste
 """
 
 import json
+import os
 import subprocess
 import webbrowser
 from pathlib import Path
@@ -166,24 +167,57 @@ def open_url(url: str) -> bool:
         }
 
         if browser_choice == 'Navigateur par défaut du système':
-            # Utiliser webbrowser.open() qui réutilise l'instance existante du navigateur
-            # et ouvre un nouvel onglet dans la session courante
-            # new=2 force l'ouverture dans un nouvel onglet si possible
-            webbrowser.open(url, new=2)
-            logger.info(f"URL ouverte dans un nouvel onglet du navigateur: {url}")
-            return True
+            # Sur Windows avec PyInstaller, utiliser cmd /c start qui est la méthode la plus fiable
+            # Cette méthode utilise le shell Windows pour ouvrir l'URL sans créer de processus enfant
+            try:
+                # Utiliser cmd /c start pour déléguer complètement au système Windows
+                # CREATE_NO_WINDOW évite l'ouverture d'une fenêtre cmd
+                # DETACHED_PROCESS détache complètement le processus
+                subprocess.Popen(
+                    ['cmd', '/c', 'start', '', url],
+                    creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+                    shell=False
+                )
+                logger.info(f"URL ouverte avec le navigateur par défaut (via cmd start): {url}")
+                return True
+            except Exception as e:
+                logger.error(f"Erreur avec cmd start: {e}")
+                # Fallback sur os.startfile
+                try:
+                    os.startfile(url)
+                    logger.info(f"URL ouverte avec os.startfile: {url}")
+                    return True
+                except Exception as e2:
+                    logger.error(f"Erreur avec os.startfile: {e2}")
+                    webbrowser.open(url, new=2)
+                    logger.info(f"URL ouverte avec webbrowser: {url}")
+                    return True
 
         elif browser_choice == 'Personnalisé...':
             # Utiliser le chemin personnalisé
             custom_path = config['custom_browser_path']
             if custom_path and Path(custom_path).exists():
-                subprocess.Popen([custom_path, url])
+                # Sur Windows, utiliser DETACHED_PROCESS pour éviter que le navigateur hérite du processus parent
+                subprocess.Popen(
+                    [custom_path, url],
+                    creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+                )
                 logger.info(f"URL ouverte avec le navigateur personnalisé {custom_path}: {url}")
                 return True
             else:
                 logger.error(f"Navigateur personnalisé introuvable: {custom_path}")
-                # Fallback sur le navigateur par défaut
-                webbrowser.open(url)
+                # Fallback sur le navigateur par défaut avec cmd start
+                try:
+                    subprocess.Popen(
+                        ['cmd', '/c', 'start', '', url],
+                        creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+                        shell=False
+                    )
+                except:
+                    try:
+                        os.startfile(url)
+                    except:
+                        webbrowser.open(url)
                 return True
 
         elif browser_choice in browser_paths:
@@ -193,25 +227,61 @@ def open_url(url: str) -> bool:
                 browser_path = browser_path.replace('{username}', Path.home().name)
 
                 if Path(browser_path).exists():
-                    subprocess.Popen([browser_path, url])
+                    # Sur Windows, utiliser DETACHED_PROCESS pour éviter que le navigateur hérite du processus parent
+                    subprocess.Popen(
+                        [browser_path, url],
+                        creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+                    )
                     logger.info(f"URL ouverte avec {browser_choice}: {url}")
                     return True
 
             # Si le navigateur n'est pas trouvé, utiliser le navigateur par défaut
             logger.warning(f"{browser_choice} introuvable, utilisation du navigateur par défaut")
-            webbrowser.open(url)
+            try:
+                subprocess.Popen(
+                    ['cmd', '/c', 'start', '', url],
+                    creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+                    shell=False
+                )
+            except:
+                try:
+                    os.startfile(url)
+                except:
+                    webbrowser.open(url)
             return True
 
         else:
-            # Par défaut, utiliser le navigateur système
-            webbrowser.open(url)
+            # Par défaut, utiliser le navigateur système avec cmd start
+            try:
+                subprocess.Popen(
+                    ['cmd', '/c', 'start', '', url],
+                    creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+                    shell=False
+                )
+            except:
+                try:
+                    os.startfile(url)
+                except:
+                    webbrowser.open(url)
             return True
 
     except Exception as e:
         logger.error(f"Erreur lors de l'ouverture de l'URL {url}: {e}")
-        # Dernière tentative avec le navigateur par défaut
+        # Dernière tentative avec cmd start
         try:
-            webbrowser.open(url)
+            subprocess.Popen(
+                ['cmd', '/c', 'start', '', url],
+                creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS,
+                shell=False
+            )
             return True
         except:
-            return False
+            try:
+                os.startfile(url)
+                return True
+            except:
+                try:
+                    webbrowser.open(url)
+                    return True
+                except:
+                    return False
